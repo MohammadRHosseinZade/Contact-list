@@ -28,7 +28,7 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Taha Task API Documentation',
-    'DESCRIPTION': 'API for cryptocurrency profits in one year',
+    'DESCRIPTION': 'API for Contacts list for a user',
     'VERSION': '0.0.1',
 
     'AUTHENTICATION_CLASSES': (
