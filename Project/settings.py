@@ -144,4 +144,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom user model config
 
-AUTH_USER_MODEL = "accounts.User"
+AUTH_USER_MODEL = "Accounts.User"
