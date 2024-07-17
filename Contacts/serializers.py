@@ -14,3 +14,7 @@ class GenerateContactSerializer(serializers.Serializer):
             return value
         raise serializers.ValidationError("Phone number format is invalid. Example: +989213006869")
     
+class UpdateContactDetail(serializers.Serializer):
+    full_name = serializers.CharField(max_length = 128)
+    address = serializers.CharField(required=False)
+    description = serializers.CharField(required=False) 

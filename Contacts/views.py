@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status,parsers
 from django.forms.models import model_to_dict
 from drf_spectacular.utils import extend_schema
-from .serializers import GenerateContactSerializer
+from .serializers import GenerateContactSerializer, UpdateContactDetail
 from .models import (ContactDetail, UserContactsDetail, Phone2ContactDetail, PhoneNumber)
 
 class GeneratePhoneContactView(APIView):
@@ -40,7 +40,7 @@ class UserContactlistView(APIView):
     )
     def get(self, request):
             try:
-                user = self.request.user
+                user = request.user
                 obj_list = UserContactsDetail.objects.filter(user_id = user)
                 result = []
                 for obj in obj_list:
@@ -50,3 +50,26 @@ class UserContactlistView(APIView):
             except Exception as e:
                 return Response({'error': f'Error generating contact: {e}'}, status=status.HTTP_400_BAD_REQUEST)   
     
+
+class ContactInfoUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [parsers.JSONParser, parsers.FormParser]
+    @extend_schema(
+        description='Updating a Contact details',
+        request=UpdateContactDetail,
+        responses={200: 'application/json'}
+    )
+    def put(self, request, detail_id):
+        serializer = UpdateContactDetail(data=request.data)
+        if serializer.is_valid():
+            try: 
+                user = request.user
+                obj = UserContactsDetail.objects.filter(user_id = user).get(phone_detail_id__detail_id__id = detail_id).phone_detail_id
+                obj.detail_id.full_name = serializer.validated_data['full_name']
+                obj.detail_id.description = serializer.validated_data['description']
+                obj.detail_id.address = serializer.validated_data['address']
+                obj.detail_id.save()
+                return Response({'data': model_to_dict(obj.detail_id)}, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({'error': f'Error generating contact: {e}'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
