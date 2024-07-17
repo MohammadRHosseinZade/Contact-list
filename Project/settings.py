@@ -1,23 +1,47 @@
-
 from pathlib import Path
+from datetime import timedelta
+from os import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+BASE_DIR_STR = str(BASE_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-e_hpn-rcv&t@+)99$qw)pou!jz%f%vqch^6h_0e%_o)(wb)n=h'
+SECRET_KEY = 'django-insecure-2atr1nlxnq=mltod57$#lqaf46850$42znbb%j68x-5ftfa(0g'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
+REST_FRAMEWORK = {
+'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.PageNumberPagination',
+'PAGE_SIZE': 10,
+'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+'DEFAULT_AUTHENTICATION_CLASSES': (
+       'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
 
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Taha Task API Documentation',
+    'DESCRIPTION': 'API for cryptocurrency profits in one year',
+    'VERSION': '0.0.1',
+
+    'AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'SWAGGER_UI_SETTINGS': {
+        'persistAuthorization': True,
+    },
+}
 # Application definition
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),}
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -26,6 +50,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'drf_spectacular',
+    'rest_framework_simplejwt',
+    'Accounts',
 ]
 
 MIDDLEWARE = [
@@ -62,12 +90,14 @@ WSGI_APPLICATION = 'Project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+DATABASES = {'default': {'ENGINE': 'django.db.backends.postgresql',
+                             'USER': environ.get('DB_USER',''),
+                             'PASSWORD': environ.get('DB_PASSWORD',''),
+                             'HOST': environ.get('DB_HOST',''),
+                             'PORT': environ.get('DB_PORT',''),
+                             'NAME': environ.get('DB_DBNAME',''),
+                        }
+            }
 
 
 # Password validation
@@ -110,3 +140,8 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Custom user model config
+
+AUTH_USER_MODEL = "accounts.User"
