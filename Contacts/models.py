@@ -6,8 +6,8 @@ class PhoneNumber(models.Model):
 
 class ContactDetail(models.Model):
     full_name = models.CharField(max_length=128)
-    address = models.TextField()
-    description = models.TextField()
+    address = models.TextField(null=True)
+    description = models.TextField(null=True)
 
 class Phone2ContactDetail(models.Model):
     phone_id = models.ForeignKey(PhoneNumber, on_delete=models.CASCADE)    
