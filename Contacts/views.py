@@ -5,6 +5,7 @@ from rest_framework import status,parsers
 from django.forms.models import model_to_dict
 from drf_spectacular.utils import extend_schema
 from .serializers import GenerateContactSerializer, UpdateContactDetail
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from .models import (ContactDetail, UserContactsDetail, Phone2ContactDetail, PhoneNumber)
 
 class GeneratePhoneContactView(APIView):
@@ -57,7 +58,7 @@ class ContactInfoUpdateView(APIView):
     @extend_schema(
         description='Updating a Contact details',
         request=UpdateContactDetail,
-        responses={200: 'application/json'}
+        responses={200: 'application/json', 400: 'application/json', 404: 'application/json'}
     )
     def put(self, request, detail_id):
         serializer = UpdateContactDetail(data=request.data)
@@ -70,6 +71,29 @@ class ContactInfoUpdateView(APIView):
                 obj.detail_id.address = serializer.validated_data['address']
                 obj.detail_id.save()
                 return Response({'data': model_to_dict(obj.detail_id)}, status=status.HTTP_200_OK)
+            except ObjectDoesNotExist:
+                return Response({'error': 'Contact detail not found'}, status=status.HTTP_404_NOT_FOUND)
             except Exception as e:
                 return Response({'error': f'Error generating contact: {e}'}, status=status.HTTP_400_BAD_REQUEST)
+            
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+    
+
+class DeleteContactView(APIView):
+    permission_classes = [IsAuthenticated]
+    @extend_schema(
+        description='Delete a contact detail',
+        responses={200: 'application/json', 400: 'application/json', 404: 'application/json'}
+    )
+    def delete(self, request, detail_id):
+        try:
+            user = request.user
+            contact_detail = UserContactsDetail.objects.get(user_id=user, phone_detail_id__detail_id__id=detail_id).phone_detail_id
+            contact_detail.detail_id.delete()
+            return Response({'success': "Contact deleted"}, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response({'error': 'Contact detail not found'}, status=status.HTTP_404_NOT_FOUND)
+        except PermissionDenied:
+            return Response({'error': 'You do not have permission to delete this contact'}, status=status.HTTP_403_FORBIDDEN)
+        except Exception as e:
+            return Response({'error': f'Error deleting contact: {e}'}, status=status.HTTP_400_BAD_REQUEST)
