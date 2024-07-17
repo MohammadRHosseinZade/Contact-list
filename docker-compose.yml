@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    
+    volumes:
+      - .:/master
+    environment:
+      DB_DBNAME: contactprj
+      DB_USER: contactprj_user
+      DB_PASSWORD: contactprj_password
+      DB_PORT: 5432
+      DB_HOST: db
+    ports:
+      - "8010:8010"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - taha_network   
+    command: >
+      sh -c "
+             while ! nc -z db 5432 ; do echo 'waiting for main db...' & sleep 3 ; done &&
+             python setup.py &&
+             python manage.py runserver 0.0.0.0:8010"
+
+
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: contactprj
+      POSTGRES_USER: contactprj_user
+      POSTGRES_PASSWORD: contactprj_password
+    ports:
+      - "5432:5432"
+    networks:
+      - taha_network 
+
+volumes:
+  postgres_data:
+
+networks:
+  taha_network:
+    driver: bridge
