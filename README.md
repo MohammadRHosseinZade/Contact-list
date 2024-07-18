@@ -22,7 +22,7 @@ It allows users to create, update, delete, and view contacts with ease. The appl
 
 
     ```
-    git clone https://github.com/yourusername/Contact-list-main.git
+    git clone https://github.com/MohammadRHosseinZade/Contact-list.git
     cd Contact-list-main
     ```
 ### Using Docker
@@ -33,7 +33,7 @@ It allows users to create, update, delete, and view contacts with ease. The appl
     docker-compose up --build
     ```
 
-2. Access the application at `http://localhost:8000`.
+2. Access the application at `http://localhost:8010`.
 
 ### Services
 
