@@ -75,6 +75,6 @@ Below are the endpoints available in the Contact List Application:
   - Response: `{ "access": "new JWT access token" }`
   
 - **POST /auth/register/**: Register a new user.
-  - Request body: `{"username": "string", "password": "string", "email": "string"}`
-  - Response: `{ "id": "int", "username": "string", "email": "string" }`
+  - Request body: `{ "password": "string", "email": "string"}`
+
   
